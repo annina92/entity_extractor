@@ -83,7 +83,22 @@ def query_for_information_entity_extraction(entity_name):
 
     return results
 
-#query_for_extraction_entity("Wyndham Capital Mortgage")
+def query_for_entity_classification(entity_name):
+    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    sparql.setQuery(
+    "PREFIX db: <http://dbpedia.org/resource/>"
+    "PREFIX prop: <http://dbpedia.org/property/>"
+    "PREFIX onto: <http://dbpedia.org/ontology/>"
+    
+    "SELECT ?property ?value "
+    "WHERE { db:"+entity_name+" ?property ?value  }"
+    )
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+
+    return results
+
+#query_for_entity_classification("Wyndham Capital Mortgage")
 
 ###
 ### https://stackoverflow.com/questions/20937556/how-to-get-all-companies-from-dbpedia
