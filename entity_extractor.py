@@ -21,6 +21,10 @@ with open("./dict_companies_html_test.json", 'r+') as myfile:
     data=myfile.read()
 dbpedia_companies_html = json.loads(data)
 
+with open("../dict_companies_pages.json", 'r+') as myfile:
+    data=myfile.read()
+dict_companies_pages = json.loads(data)
+
 def extract_test_data():
     dict_test = {}
     counter =0
@@ -107,15 +111,25 @@ def match_dbpedia_properties_with_wiki_links(wiki_links, dbproperties):
         dict_entities = extract_wiki_page_type(entity_value)
         print(dict_entities)
 
+def clean_page_text(page):
+    tags_pattern = r"==.*=="
+    empty_lines_pattern= r"^\s+$[\r\n]*"
 
+    page = re.sub(tags_pattern, "", page)
 
+    page = re.sub(empty_lines_pattern, "", page)
 
+    return page
     
 def main():
-
-    company_name = "Luke Records"
+    company_name = "Haas Type Foundry"
+    for word in dbpedia_companies_html:
+        print(word)
     html_doc = dbpedia_companies_html[company_name]
+    text = clean_page_text(dict_companies_pages[company_name])
+    print(text)
     legit_wiki_links = extract_wiki_page_links(html_doc)
+    print(legit_wiki_links)
     dbpedia_properties = extract_dbpedia_properties(company_name)
     print(dbpedia_properties)
     match_dbpedia_properties_with_wiki_links(legit_wiki_links, dbpedia_properties)
