@@ -17,7 +17,7 @@ from nltk.corpus import words, stopwords, wordnet
 
 from collections import Counter, defaultdict
 
-with open("./dict_companies_html.json", 'r+') as myfile:
+with open("./dict_companies_html_test.json", 'r+') as myfile:
     data=myfile.read()
 dbpedia_companies_html = json.loads(data)
 
@@ -36,10 +36,22 @@ def extract_test_data():
 extract_test_data()
 
 def extract_dbpedia_properties(company_name):
+    metadata = ["wikiPageWikiLink", "wikiPageID", "wikiPageExternalLink", "wikiPageRevisionID", "abstract"]
     dbpedia_data = sparql_utility.query_for_information_entity_extraction(company_name)
-    r = dbpedia_data["property"]["value"]
-    print(r)
-    return 0
+    data = dbpedia_data["results"]["bindings"]
+
+    dict_properties_values = {}
+    for record in data:
+        record_property = record["property"]["value"]
+        record_value = record["value"]["value"]
+        
+        if "http://dbpedia.org/ontology/" in record_property and not any([x in record_property for x in metadata]):
+
+            record_property = record_property.replace("http://dbpedia.org/ontology/", "")
+            record_value = record_value.replace("http://dbpedia.org/resource/", "")
+            dict_properties_values[record_property] = record_value
+    
+    return dict_properties_values
 
 
 
@@ -60,11 +72,11 @@ def extract_wiki_page_links(html_doc):
     return entities_links
 
 def main():
-    company_name = "Wyndham Capital Mortgage"
+
+    company_name = "Luke Records"
     html_doc = dbpedia_companies_html[company_name]
     legit_wiki_links = extract_wiki_page_links(html_doc)
-
     dbpedia_properties = extract_dbpedia_properties(company_name)
-
+    print(dbpedia_properties)
 
 main()
